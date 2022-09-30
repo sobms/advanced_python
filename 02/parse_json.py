@@ -1,4 +1,5 @@
 import json
+from faker import Faker
 
 def keyword_callback(word):
     return word.upper()
@@ -19,4 +20,10 @@ def parse_json(json_str: str, keyword_callback, required_fields=None, keywords=N
     return json.dumps(json_doc)
 
 if __name__ == '__main__':
-    print(parse_json('{"key2" : "word1 word2", "key3" : "word1 word3 word4"}', keyword_callback, required_fields=["key1"], keywords=["word2"]))
+    fake = Faker()
+    keywords = [fake.numerify(text='word%#') for _ in range(fake.random_int(max=100))]
+    required_fields = [fake.numerify(text='key%#') for _ in range(fake.random_int(max=100))]
+    json_str = json.dumps({fake.numerify(text='key%#'):
+                               ' '.join([fake.numerify(text='word%#') for _ in range(fake.random_int(min=1, max=10))])
+                           for _ in range(fake.random_int(max=20))})
+    print(parse_json(json_str, keyword_callback, required_fields, keywords))

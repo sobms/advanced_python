@@ -37,6 +37,22 @@ class ParseJsonTest(unittest.TestCase):
         self.assertEqual(parse_json(json_str, keyword_callback_mock, required_fields, keywords),
                          '{"key2": "word1 word2", "key3": "word1 word3 word4"}')
         self.assertEqual(keyword_callback_mock.call_count, 4)
+        #case5
+        json_str = '{"key1": "Word1 word2 word3", "key2": "word2 word3", "key3": "word1 word4 word5"}'
+        required_fields = []
+        keywords = ["word2", "word3", "word4"]
+        keyword_callback_mock.return_value = 'str1'
+        self.assertEqual(parse_json(json_str, keyword_callback_mock, required_fields, keywords),
+                         '{"key1": "Word1 word2 word3", "key2": "word2 word3", "key3": "word1 word4 word5"}')
+        self.assertEqual(keyword_callback_mock.call_count, 4)
+        #case6
+        json_str = '{"key1": "Word1 word2 word3", "key2": "word2 word3", "key3": "word1 word4 word5"}'
+        required_fields = ["key2", "key3"]
+        keywords = []
+        keyword_callback_mock.return_value = 'str1'
+        self.assertEqual(parse_json(json_str, keyword_callback_mock, required_fields, keywords),
+                         '{"key1": "Word1 word2 word3", "key2": "word2 word3", "key3": "word1 word4 word5"}')
+        self.assertEqual(keyword_callback_mock.call_count, 4)
 
 
 
