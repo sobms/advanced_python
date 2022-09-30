@@ -1,4 +1,4 @@
 **/env
 *.idea
 *.coverage
-*__pycache__
+**/__pycache__
