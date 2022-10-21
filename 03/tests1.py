@@ -1,6 +1,7 @@
 import unittest
 from custom_list import CustomList
 
+
 class CustomListTest(unittest.TestCase):
     def setUp(self):
         self.list1 = CustomList([1, 2, 3, 0, 6, 4])
