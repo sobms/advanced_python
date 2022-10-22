@@ -3,8 +3,8 @@ def filter_file(file, words_list):
     if isinstance(file, str):
         file = open(file, "r")
     while True:
-        line = file.readline().lower()
-        for word in line.split():
+        line = file.readline()
+        for word in line.lower().split():
             if word in words_dict:
                 yield line
         if not line:
