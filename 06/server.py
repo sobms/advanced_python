@@ -27,9 +27,13 @@ class ServerApp:
         self.listen_port()
     @staticmethod
     def parse_url(url):
-        with requests.Session() as s:
-            response = s.get(url)
-            return response.text
+        try:
+            with requests.Session() as s:
+                response = s.get(url)
+                return response.text
+        except requests.ConnectionError as err:
+            print(err)
+            return None
     def get_most_frequent_words(self, html):
         soup = BeautifulSoup(html, 'lxml')
         words = re.findall("[A-Za-zА-Яа-я0-9_]+", soup.text)
@@ -42,6 +46,9 @@ class ServerApp:
             data = conn.recv(1024)
             with self.semaphore:
                 html = self.parse_url(data.decode())
+            if html is None:
+                conn.close()
+                continue
             response_data = self.get_most_frequent_words(html)
             conn.sendall(response_data.encode())
             self.lock.acquire()
@@ -74,7 +81,10 @@ class ServerApp:
             s.listen(self.args.workers)
             while True:
                 conn, addr = s.accept()
+                self.lock.acquire()
+                # to not write from different thread simultaneous
                 print('Connected by', addr)
+                self.lock.release()
                 self.jobs_queue.put(conn)
 
 if __name__ == '__main__':
