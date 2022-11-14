@@ -3,6 +3,7 @@ import socket
 import queue
 import threading
 import requests
+from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 import re
 from collections import Counter
@@ -31,8 +32,11 @@ class ServerApp:
             with requests.Session() as s:
                 response = s.get(url)
                 return response.text
-        except requests.ConnectionError as err:
-            print(err)
+        except requests.HTTPError as http_err:
+            print(f'HTTP error occurred: {http_err}')
+            return None
+        except Exception as err:
+            print(f'Some error occurred: {err}')
             return None
     def get_most_frequent_words(self, html):
         soup = BeautifulSoup(html, 'lxml')
@@ -44,6 +48,10 @@ class ServerApp:
             #try to get new client
             conn = que.get()
             data = conn.recv(1024)
+            if data is None:
+                conn.close()
+                print("Received None")
+                continue
             with self.semaphore:
                 html = self.parse_url(data.decode())
             if html is None:
@@ -70,15 +78,19 @@ class ServerApp:
             th.start()
 
     def listen_port(self):
-        # create tcp socket and start listening of port
+
         host, port = "", 50007  # all interfaces, port 50007
         if socket.has_dualstack_ipv6():
             family = socket.AF_INET6
         else:
             family = socket.AF_INET
         with socket.socket(family=family) as s:
-            s.bind((host, port))
-            s.listen(self.args.workers)
+            try:
+                s.bind((host, port))
+                s.listen(self.args.workers)
+            except socket.error as msg:
+                print("Socket binding error: " + str(msg))
+                return 1
             while True:
                 conn, addr = s.accept()
                 self.lock.acquire()

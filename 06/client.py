@@ -3,6 +3,7 @@ import argparse
 import threading
 import json
 import queue
+import os
 import time
 
 def parse_arguments():
@@ -53,5 +54,8 @@ class ClientApp:
 
 if __name__ == '__main__':
     args = parse_arguments()
-    app = ClientApp(args)
-    app.start()
+    if not os.path.isfile(args.path_to_urls):
+        print(f"FileNotFoundError: file {args.path_to_urls} not exist.")
+    else:
+        app = ClientApp(args)
+        app.start()
