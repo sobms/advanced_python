@@ -1,6 +1,0 @@
-cutils.cpp
-setup.py
-cutils.egg-info/PKG-INFO
-cutils.egg-info/SOURCES.txt
-cutils.egg-info/dependency_links.txt
-cutils.egg-info/top_level.txt
