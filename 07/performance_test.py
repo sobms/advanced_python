@@ -2,28 +2,7 @@
 
 import time
 import cutils
-
-
-def matrix_multiplication(*args):
-    matrix_a = args[0]
-    result = []
-    for i in range(1, len(args)):
-        matrix_b = args[i]
-        result = []
-        for j in range(len(matrix_a)):
-            row = []
-            for k in range(len(matrix_b[0])):
-                row.append(
-                    sum(
-                        [
-                            matrix_a[j][t] * matrix_b[t][k]
-                            for t in range(len(matrix_a[j]))
-                        ]
-                    )
-                )
-            result.append(row)
-        matrix_a = result
-    return result
+from py_matrix_multiplication import matrix_multiplication
 
 
 def main():
