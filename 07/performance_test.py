@@ -19,14 +19,16 @@ def main():
     result = matrix_multiplication(*args)
     end_time = time.time()
     print(
-        f"Time of execution of python matrix multiplication is {end_time-start_time} seconds"
+        f"Time of execution of python matrix multiplication is "
+        f"{end_time-start_time} seconds"
     )
     print("+---------- capi ----------+")
     start_time = time.time()
     result_capi = cutils.matrix_multiplication(*args)
     end_time = time.time()
     print(
-        f"Time of execution of capi matrix multiplication is {end_time-start_time} seconds"
+        f"Time of execution of capi matrix multiplication is "
+        f"{end_time-start_time} seconds"
     )
     assert result == result_capi
 
