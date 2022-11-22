@@ -1,11 +1,11 @@
-import asyncio
-import aiohttp
-from bs4 import BeautifulSoup
 from collections import Counter
+import asyncio
 import json
 import re
 import argparse
 import time
+import aiohttp
+from bs4 import BeautifulSoup
 
 
 def parse_arguments():
@@ -23,9 +23,11 @@ def parse_arguments():
     parser.add_argument(
         "path_to_urls",
         type=str,
-        help="Specify path to file with urls")
+        help="Specify path to file with urls"
+    )
 
     return parser.parse_args()
+
 
 class Fetcher:
     def __init__(self, urls, tasks_count, top_words):
@@ -44,35 +46,41 @@ class Fetcher:
         top_words = Counter(words).most_common(self.top_words)
         return json.dumps(dict(top_words), ensure_ascii=False)
 
-    async def fetch_url(self, session):
+    async def process_urls(self, session):
         while True:
             url = await self.que.get()
+
             try:
                 async with session.get(url) as resp:
                     response = await resp.text()
-                    print(self.get_most_frequent_words(response))
+                    result = self.get_most_frequent_words(response)
+                    print(result)
             finally:
+
                 self.que.task_done()
 
     async def start_session(self):
         for url in self.urls:
             await self.que.put(url)
 
-        start_time = time.time()
         async with aiohttp.ClientSession() as session:
-            workers = [
-                asyncio.create_task(self.fetch_url(session))
+            start_time = time.time()
+            tasks = [
+                asyncio.create_task(self.process_urls(session))
                 for _ in range(self.tasks_count)
             ]
             await self.que.join()
             end_time = time.time()
-            print(f"Time of fetching with {self.tasks_count} tasks: {end_time-start_time}")
-            for worker in workers:
-                worker.cancel()
+            print(
+                f"Time of fetching with {self.tasks_count} tasks: {end_time-start_time}"
+            )
+            for task in tasks:
+                task.cancel()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     args = parse_arguments()
-    with open(args.path_to_urls, 'r') as f:
-        urls = json.load(f)["links"]
-    fetcher = Fetcher(urls, args.tasks, args.top_words)
+    with open(args.path_to_urls, "r") as f:
+        URLS = json.load(f)["links"]
+    fetcher = Fetcher(URLS, args.tasks, args.top_words)
     fetcher.run()

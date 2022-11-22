@@ -15,5 +15,5 @@ def filter_file(file, words_list):
 
 if __name__ == "__main__":
     file_obj = open("input2", "r")
-    for string in filter_file(file_obj, ["abc", "sTu", "DEF"]):
+    for string in filter_file(file_obj, ["abc", "sTu", "DEF", "ghi"]):
         print(string, end="")
