@@ -6,9 +6,14 @@ def keyword_callback(word):
     return word.upper()
 
 
-def parse_json(json_str: str, keyword_callback, required_fields=None, keywords=None):
-    keywords_dct = dict.fromkeys(keywords, 0)
+def parse_json(json_str: str,
+               keyword_callback,
+               required_fields=None,
+               keywords=None):
+    if required_fields is None or keywords is None:
+        return json_str
     json_doc = json.loads(json_str)
+    keywords_dct = dict.fromkeys(keywords, 0)
     for field in required_fields:
         if field in json_doc:
             words_list = json_doc[field].split(" ")
@@ -24,9 +29,13 @@ def parse_json(json_str: str, keyword_callback, required_fields=None, keywords=N
 
 if __name__ == "__main__":
     fake = Faker()
-    keywords = [fake.numerify(text="word%#") for _ in range(fake.random_int(max=100))]
+    keywords = [
+        fake.numerify(text="word%#")
+        for _ in range(fake.random_int(max=100))
+    ]
     required_fields = [
-        fake.numerify(text="key%#") for _ in range(fake.random_int(max=100))
+        fake.numerify(text="key%#")
+        for _ in range(fake.random_int(max=100))
     ]
     json_str = json.dumps(
         {
