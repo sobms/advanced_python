@@ -14,14 +14,16 @@ class TicTacGame:
 
     def show_board(self):
         print("+---" * len(self.field) + "+")
-        for i in range(len(self.field)):
-            for j in range(len(self.field)):
-                print(f"| {self.d[self.field[i][j]]} ", end="")
+        for row in self.field:
+            for elem in row:
+                print(f"| {self.d[elem]} ", end="")
             print("|")
             print("+---" * len(self.field) + "+")
 
     def players_move(self, player):
-        print(f"Make your move {player}")
+        print(f'Make your move {player}.\n'
+              f'Type coordinates of cell (in range 1 to field_size) '
+              f'in format: <x y>')
         while True:
             values = input().split(" ")
             marker = 2 if player == self.player2 else 1
@@ -32,29 +34,38 @@ class TicTacGame:
                 print(input_err)
 
     def validate_size(self, size):  # test
-        if not size.isdigit():
+        if not size.isdecimal():
             raise InputError("Wrong input!")
         if int(size) > 20 or int(size) < 3:
-            raise InputError("Wrong input! Size more or less than acceptable value!")
-        else:
-            self.size = int(size)
-            self.field = [[0 for _ in range(self.size)] for _ in range(self.size)]
+            raise InputError(
+                "Wrong input! Size more or less than acceptable value!"
+            )
+        self.size = int(size)
+        self.field = [[0 for _ in range(self.size)] for _ in range(self.size)]
 
     def validate_input(self, values, marker):  # test
         if len(values) != 2:
-            raise InputError("Wrong input! Incorrect number of coordinates!")
+            raise InputError(
+                "Wrong input! Incorrect number of coordinates!"
+            )
         for i in values:
-            if not i.isdigit() or int(i) > len(self.field) or int(i) < 1:
-                raise InputError("Wrong input! Incorrect values.")
+            if not i.isdecimal() or int(i) > len(self.field) or int(i) < 1:
+                raise InputError(
+                    "Wrong input! Incorrect values."
+                )
 
         x, y = values
         if self.field[int(y) - 1][int(x) - 1] != 0:
-            raise InputError("Wrong input! Cell is already filled!")
+            raise InputError(
+                "Wrong input! Cell is already filled!"
+            )
         self.field[int(y) - 1][int(x) - 1] = marker
 
     def validate_player_names(self):
         if self.player1 == self.player2:
-            raise InputError("Wrong input! Player names should be different!")
+            raise InputError(
+                "Wrong input! Player names should be different!"
+            )
 
     def start_game_p_vs_p(self):
         while True:
@@ -103,19 +114,22 @@ class TicTacGame:
             winner = self.markers[self.field[0][0]]
         if (
             all(
-                self.field[dim - 1 - i][i] == self.field[dim - 1][0] for i in range(dim)
+                self.field[dim - 1 - i][i] == self.field[dim - 1][0]
+                for i in range(dim)
             )
             and self.field[dim - 1][0] != 0
         ):
             winner = self.markers[self.field[dim - 1][0]]
         for i in range(dim):
             if (
-                all(self.field[i][j] == self.field[i][0] for j in range(dim))
+                all(self.field[i][j] == self.field[i][0]
+                    for j in range(dim))
                 and self.field[i][0] != 0
             ):  # i-masая строка
                 winner = self.markers[self.field[i][0]]
             if (
-                all(self.field[j][i] == self.field[0][i] for j in range(dim))
+                all(self.field[j][i] == self.field[0][i]
+                    for j in range(dim))
                 and self.field[0][i] != 0
             ):  # i-ый столбец
                 winner = self.markers[self.field[0][i]]

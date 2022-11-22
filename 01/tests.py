@@ -16,6 +16,9 @@ class TicTacTest(unittest.TestCase):
             self.game.validate_size("2.1")
 
         with self.assertRaises(InputError):
+            self.game.validate_size("3²")
+
+        with self.assertRaises(InputError):
             self.game.validate_size("2")
 
         self.game.validate_size("15")
@@ -30,6 +33,9 @@ class TicTacTest(unittest.TestCase):
 
         with self.assertRaises(InputError):
             self.game.validate_input(["4, 3"], 1)
+
+        with self.assertRaises(InputError):
+            self.game.validate_input(["2²", "1"], 1)
 
         with self.assertRaises(InputError):
             self.game.validate_input(["1,1"], 1)
