@@ -1,4 +1,5 @@
 class CustomMeta(type):
+
     def __call__(cls):
         prefix = "custom_"
         new_obj = super(CustomMeta, cls).__call__()  # call new + init
@@ -11,13 +12,23 @@ class CustomMeta(type):
                     delattr(new_obj, attr)
         return new_obj
 
-    def __setattr__(self, name, val):
+    def __new__(cls, name, bases, dct):
         prefix = "custom_"
-        if name not in self.__dict__:
-            if not name.startswith(prefix):
-                name = prefix + name
-        super().__setattr__(name, val)
+        inst = super(CustomMeta, cls).__new__(cls, name, bases, dct)
+        def meta_setattr(inst, name, value):
+            if name not in inst.__dict__ and \
+                    not (name.startswith("__") or name.endswith("__")):
+                inst.__dict__[prefix+name] = value
+        inst.__setattr__ = meta_setattr
+        return inst
 
+    # def __setattr__(self, name, val):
+    #     prefix = "custom_"
+    #     if name not in self.__dict__:
+    #         if not name.startswith(prefix):
+    #             name = prefix + name
+    #     super().__setattr__(name, val)
+# идея переопределить метод setattr в создаваемом экземпляре
 
 class CustomClass(metaclass=CustomMeta):
     x = 50
@@ -31,12 +42,12 @@ class CustomClass(metaclass=CustomMeta):
     def __str__(self):
         return "Custom_by_metaclass"
 
-    def __setattr__(self, name, val):
-        prefix = "custom_"
-        if name not in self.__dict__:
-            if not name.startswith(prefix):
-                name = prefix + name
-        super().__setattr__(name, val)
+    # def __setattr__(self, name, val):
+    #     prefix = "custom_"
+    #     if name not in self.__dict__:
+    #         if not name.startswith(prefix):
+    #             name = prefix + name
+    #     super().__setattr__(name, val)
 
 
 if __name__ == "__main__":
