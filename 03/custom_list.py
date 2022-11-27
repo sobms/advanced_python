@@ -3,7 +3,8 @@ class CustomList(list):
         # checking if incorrect types
         if not isinstance(x, list):
             raise TypeError(
-                "can only add one list (not " + str(type(x)) + ") to another list"
+                f"can only add one list "
+                f"(not {str(type(x))}) to another list"
             )
         # create instance to return
         result_list = CustomList()
@@ -23,9 +24,8 @@ class CustomList(list):
     def __sub__(self, x: list):
         if not isinstance(x, list):
             raise TypeError(
-                "can only subtract one list (not "
-                + str(type(x))
-                + ") from another list"
+                f"can only subtract one list "
+                f"(not {str(type(x))}) from another list"
             )
         result_list = CustomList()
         result_list.extend(self)
@@ -45,30 +45,50 @@ class CustomList(list):
     def __ge__(self, x: list) -> bool:
         if not isinstance(x, list):
             raise TypeError(
-                "can only compare one list (not " + str(type(x)) + ") with another list"
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
             )
         return sum(self) >= sum(x)
 
     def __le__(self, x: list) -> bool:
         if not isinstance(x, list):
             raise TypeError(
-                "can only compare one list (not " + str(type(x)) + ") with another list"
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
             )
         return sum(self) <= sum(x)
 
     def __lt__(self, x: list) -> bool:
         if not isinstance(x, list):
             raise TypeError(
-                "can only compare one list (not " + str(type(x)) + ") with another list"
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
             )
         return sum(self) < sum(x)
 
     def __gt__(self, x: list) -> bool:
         if not isinstance(x, list):
             raise TypeError(
-                "can only compare one list (not " + str(type(x)) + ") with another list"
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
             )
         return sum(self) > sum(x)
+
+    def __eq__(self, x: list):
+        if not isinstance(x, list):
+            raise TypeError(
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
+            )
+        return sum(self) == sum(x)
+
+    def __ne__(self, x: list):
+        if not isinstance(x, list):
+            raise TypeError(
+                f"can only compare one list (not "
+                f"{str(type(x))}) with another list"
+            )
+        return sum(self) != sum(x)
 
     def __str__(self):
         return f"{super().__str__()} sum: {str(sum(self))}"
