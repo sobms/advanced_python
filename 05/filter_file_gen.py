@@ -7,6 +7,7 @@ def filter_file(file, words_list):
         for word in line.lower().split():
             if word in words_dict:
                 yield line
+                break
         if not line:
             break
 
@@ -15,5 +16,5 @@ def filter_file(file, words_list):
 
 if __name__ == "__main__":
     file_obj = open("input2", "r")
-    for string in filter_file(file_obj, ["abc", "sTu", "DEF", "ghi"]):
+    for string in filter_file(file_obj, ["abc", "sTu", "DEF", "ghi", "jkl"]):
         print(string, end="")

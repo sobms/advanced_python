@@ -4,7 +4,7 @@ from collections import deque
 class LRUCache:
     def __init__(self, limit=42):
         self.cache = {}
-        self.key_order = deque(maxlen=2)
+        self.key_order = deque(maxlen=limit)
         self.limit = limit
 
     def get(self, key):
