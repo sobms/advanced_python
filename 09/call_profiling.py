@@ -1,29 +1,30 @@
+import cProfile
+import pstats
+import io
 import random
-from memory_profiler import profile
 from weakref_slots_comparing import (
-    SimplePolygon,
+    move_object,
     SlotsPolygon,
+    SimplePolygon,
     PolygonWithWeakRefTexture,
     Point,
     SlotsPoint,
-    move_object,
     N,
 )
 
 
-@profile
-def run():
+if __name__ == "__main__":
     object1 = [
         SimplePolygon(
             [Point(*[random.randint(1, 1024) for _ in range(3)])
-             for _ in range(4)]
+             for _ in range(3)]
         )
         for i in range(N)
     ]
     object2 = [
         SlotsPolygon(
             [SlotsPoint(*[random.randint(1, 1024) for _ in range(3)])
-             for _ in range(4)]
+             for _ in range(3)]
         )
         for i in range(N)
     ]
@@ -35,14 +36,16 @@ def run():
         for i in range(N)
     ]
 
+    pr = cProfile.Profile()
+    pr.enable()
     move_object(object1, [100, 100, 100])
     move_object(object2, [100, 100, 100])
     move_object(object3, [100, 100, 100])
+    pr.disable()
 
-    del object1
-    del object2
-    del object3
+    s = io.StringIO()
+    SORTBY = "cumulative"
+    ps = pstats.Stats(pr, stream=s).sort_stats(SORTBY)
+    ps.print_stats()
 
-
-if __name__ == "__main__":
-    run()
+    print(s.getvalue())
