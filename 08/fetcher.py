@@ -5,6 +5,7 @@ import re
 import argparse
 import time
 import aiohttp
+import ijson
 from bs4 import BeautifulSoup
 
 
@@ -36,6 +37,9 @@ class Fetcher:
         self.top_words = top_words
         self.que = asyncio.Queue()
 
+    def set_urls(self, urls):
+        self.urls = urls
+
     def run(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.start_session())
@@ -55,8 +59,9 @@ class Fetcher:
                     response = await resp.text()
                     result = self.get_most_frequent_words(response)
                     print(result)
+            except Exception as err:
+                print(f"Worker catch error: {err}")
             finally:
-
                 self.que.task_done()
 
     async def start_session(self):
@@ -72,15 +77,30 @@ class Fetcher:
             await self.que.join()
             end_time = time.time()
             print(
-                f"Time of fetching with {self.tasks_count} tasks: {end_time-start_time}"
+                f"Time of fetching with {self.tasks_count} tasks: "
+                f"{end_time-start_time}"
             )
             for task in tasks:
                 task.cancel()
 
 
+def get_batch(file, batch_size=20):
+    URLS = ijson.items(file, "links.item")
+    batch = []
+    for url in URLS:
+        batch.append(url)
+        if len(batch) == batch_size:
+            yield batch
+            batch = []
+    if len(batch) > 0:
+        yield batch
+
+
 if __name__ == "__main__":
     args = parse_arguments()
+    fetcher = Fetcher([], args.tasks, args.top_words)
     with open(args.path_to_urls, "r") as f:
-        URLS = json.load(f)["links"]
-    fetcher = Fetcher(URLS, args.tasks, args.top_words)
-    fetcher.run()
+        batch_size = 20
+        for batch in get_batch(f, batch_size):
+            fetcher.set_urls(batch)
+            fetcher.run()
