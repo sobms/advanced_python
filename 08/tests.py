@@ -36,33 +36,22 @@ class FetcherTestCase(AioHTTPTestCase):
         self.assertEqual(expected_calls, self.fetcher.que.put.mock_calls)
         self.assertTrue(self.fetcher.que.join.called)
         # test process_urls() calls count
-        self.assertEqual(
-            self.fetcher.process_urls.call_count,
-            self.fetcher.tasks_count
-        )
+        self.assertEqual(self.fetcher.process_urls.call_count, self.fetcher.tasks_count)
         # test count of tasks and canceling tasks
+        self.assertEqual(asyncio.create_task.call_count, self.fetcher.tasks_count)
         self.assertEqual(
-            asyncio.create_task.call_count,
-            self.fetcher.tasks_count
-        )
-        self.assertEqual(
-            asyncio.create_task.return_value.cancel.call_count,
-            self.fetcher.tasks_count
+            asyncio.create_task.return_value.cancel.call_count, self.fetcher.tasks_count
         )
 
     def test_get_most_frequent_words(self):
         self.fetcher.top_words = 2
         self.assertEqual(
-            self.fetcher.get_most_frequent_words(
-                "aba bab aba aab aab"
-            ),
+            self.fetcher.get_most_frequent_words("aba bab aba aab aab"),
             '{"aba": 2, "aab": 2}',
         )
         self.assertEqual(self.fetcher.get_most_frequent_words(""), "{}")
         self.assertEqual(
-            self.fetcher.get_most_frequent_words(
-                "ase: aec. alm! alm! Ase alm, aec."
-            ),
+            self.fetcher.get_most_frequent_words("ase: aec. alm! alm! Ase alm, aec."),
             '{"alm": 3, "aec": 2}',
         )
 
@@ -91,10 +80,7 @@ class FetcherTestCase(AioHTTPTestCase):
         await self.fetcher.que.join()
         task.cancel()
         # check that session.get() function was called with necessary urls
-        session.get.assert_has_calls(
-            [call(url) for url in urls],
-            any_order=True
-        )
+        session.get.assert_has_calls([call(url) for url in urls], any_order=True)
         # check that get_most_frequent_words() got correct texts
         self.fetcher.get_most_frequent_words.assert_has_calls(
             [call(text) for text in response_texts]
